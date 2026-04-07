@@ -1,2 +1,2 @@
 anon public: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkY3JxcWZyc2hjcWNreXBnaXBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1MzU3MzksImV4cCI6MjA4ODExMTczOX0.rUqR8XEJHDg8xlhOg7G28c71mv8g1Cpo3Gri4XzQPSk
-url: https://fdcrqqfrshcqckypgips.supabase.co
+url: https://supabase.com/dashboard/project/fdcrqqfrshcqckypgips
