@@ -1,5 +1,5 @@
 // Importa a função de criação do client Supabase via CDN
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+import { createClient } from 'https://supabase.com/dashboard/project/fdcrqqfrshcqckypgips'
 
 // Cria o client com a URL e a chave fornecidas
 export const supabase = createClient(
