@@ -118,13 +118,15 @@
                 <div class="input-icon">
                     <i class="fas fa-plus-circle" aria-hidden="true"></i>
                 </div>
-                <label for="item" class="visually-hidden">Nome do produto</label>
-                <input type="text" id="item" placeholder="Ex: Arroz, Leite, Café..." autocomplete="off" aria-label="Nome do produto">
+                <div class="autocomplete-wrapper" style="position: relative; flex: 1;">
+                    <label for="item" class="visually-hidden">Nome do produto</label>
+                    <input type="text" id="item" placeholder="Ex: Arroz, Leite, Café..." autocomplete="off" aria-label="Nome do produto" aria-autocomplete="list">
+                </div>
                 
                 <div class="price-input-wrapper">
                     <span class="price-currency" aria-hidden="true">R$</span>
-                    <label for="preco" class="visually-hidden">Preço médio</label>
-                    <input type="number" id="preco" placeholder="Preço" step="0.01" min="0" aria-label="Preço médio do produto">
+                    <label for="preco" class="visually-hidden">Preço</label>
+                    <input type="number" id="preco" placeholder="Preço" step="0.01" min="0" aria-label="Preço do produto">
                 </div>
                 
                 <button id="adicionarBtn" class="btn-add" onclick="adicionarItem()" aria-label="Adicionar item à lista">
@@ -132,7 +134,7 @@
                     <span>Adicionar</span>
                 </button>
             </div>
-            <p class="dica" role="note">💡 Dica: Adicione o preço médio do produto para estimar o gasto total</p>
+            <p class="dica" role="note">💡 Dica: Digite para ver sugestões de preço automático</p>
         </div>
     </div>
 
