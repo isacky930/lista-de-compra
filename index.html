@@ -1,52 +1,145 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Listify</title>
-
-    <link rel="manifest" href="manifest.json">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Minha Lista de Compras - Lista compartilhada acessível</title>
     <link rel="stylesheet" href="src/css/index.css">
-
-    <!-- Fonte -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- FontAwesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Manifest PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#EA3788">
+    <meta name="description" content="Aplicativo de lista de compras compartilhada com recursos de acessibilidade para todos os públicos">
+    
+    <!-- Controle de zoom e acessibilidade -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
 </head>
+
 <body>
+    <!-- Skip to content link para leitores de tela -->
+    <a href="#main-content" class="skip-link">Pular para o conteúdo principal</a>
+    
+    <!-- Botão de acessibilidade flutuante -->
+    <div class="accessibility-menu">
+        <button id="accessibilityBtn" class="accessibility-btn" aria-label="Abrir menu de acessibilidade" aria-expanded="false">
+            <i class="fas fa-universal-access"></i>
+            <span class="btn-text">Acessibilidade</span>
+        </button>
+        <div id="accessibilityPanel" class="accessibility-panel" hidden>
+            <h3>Ajustes de Acessibilidade</h3>
+            <button id="aumentarFonte" aria-label="Aumentar tamanho da fonte">
+                <i class="fas fa-text-height"></i> Aumentar Fonte
+            </button>
+            <button id="diminuirFonte" aria-label="Diminuir tamanho da fonte">
+                <i class="fas fa-text-height"></i> Diminuir Fonte
+            </button>
+            <button id="altoContraste" aria-label="Ativar alto contraste">
+                <i class="fas fa-adjust"></i> Alto Contraste
+            </button>
+            <button id="leitorTela" aria-label="Modo para leitor de tela">
+                <i class="fas fa-eye"></i> Modo Leitor
+            </button>
+            <button id="resetAcessibilidade" aria-label="Resetar configurações">
+                <i class="fas fa-undo-alt"></i> Resetar
+            </button>
+        </div>
+    </div>
 
-    <div class="background"></div>
-
-    <main class="container">
-
-        <header class="topbar">
-            <h1>Minha lista</h1>
-            <button class="logout" onclick="logout()">Sair</button>
+    <div class="app-container fade-in-up" id="main-content" role="main">
+        <!-- Cabeçalho -->
+        <header class="header" role="banner">
+            <div class="header-content">
+                <div class="logo-area">
+                    <i class="fas fa-basket-shopping" aria-hidden="true"></i>
+                    <h1 class="titulo" id="app-title">Lista de Compras</h1>
+                </div>
+                <button id="logoutBtn" class="btn-logout" onclick="logout()" aria-label="Sair do aplicativo">
+                    <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
+                    <span>Sair</span>
+                </button>
+            </div>
+            <p class="subtitulo">Compartilhada em tempo real - Acessível para todos</p>
         </header>
 
-        <section class="add-item">
-            <input type="text" id="item" placeholder="Adicionar item...">
-            <button onclick="adicionarItem()">+</button>
-        </section>
+        <!-- Barra de estatísticas aprimorada com ARIA -->
+        <div class="stats-bar" role="region" aria-label="Estatísticas da lista">
+            <div class="stat-item">
+                <i class="fas fa-list-ul" aria-hidden="true"></i>
+                <span id="totalItens" aria-live="polite">0</span>
+                <small>itens</small>
+            </div>
+            <div class="stat-item">
+                <i class="fas fa-check-circle" aria-hidden="true"></i>
+                <span id="itensComprados" aria-live="polite">0</span>
+                <small>comprados</small>
+            </div>
+            <div class="stat-item">
+                <i class="fas fa-clock" aria-hidden="true"></i>
+                <span id="itensPendentes" aria-live="polite">0</span>
+                <small>pendentes</small>
+            </div>
+            <div class="stat-item destaque">
+                <i class="fas fa-dollar-sign" aria-hidden="true"></i>
+                <span id="valorTotal" aria-live="polite">R$ 0,00</span>
+                <small>estimado</small>
+            </div>
+        </div>
 
-        <ul id="lista" class="lista"></ul>
+        <!-- Área da lista com ARIA -->
+        <div class="list-wrapper">
+            <div class="list-header">
+                <h3><i class="fas fa-shopping-cart" aria-hidden="true"></i> Meus itens</h3>
+                <div class="header-buttons">
+                    <button id="limparCompradosBtn" class="btn-clear" onclick="limparComprados()" aria-label="Remover todos os itens comprados">
+                        <i class="fas fa-check-double" aria-hidden="true"></i>
+                        <span>Limpar comprados</span>
+                    </button>
+                    <button id="limparListaBtn" class="btn-clear danger" onclick="limparLista()" aria-label="Remover todos os itens da lista">
+                        <i class="fas fa-trash-alt" aria-hidden="true"></i>
+                        <span>Limpar tudo</span>
+                    </button>
+                </div>
+            </div>
 
-    </main>
+            <ul id="lista" class="shopping-list" role="list" aria-label="Lista de compras">
+                <li class="empty-state" role="status">
+                    <i class="fas fa-clipboard-list" aria-hidden="true"></i>
+                    <p>Sua lista está vazia</p>
+                    <small>Adicione itens abaixo</small>
+                </li>
+            </ul>
+        </div>
 
-    <script type="module">
-        import { supabase } from './supabaseClient.js'
+        <!-- Área de adição de itens com acessibilidade -->
+        <div class="add-item-container" role="form" aria-label="Adicionar novo item">
+            <div class="add-item-wrapper">
+                <div class="input-icon">
+                    <i class="fas fa-plus-circle" aria-hidden="true"></i>
+                </div>
+                <label for="item" class="visually-hidden">Nome do produto</label>
+                <input type="text" id="item" placeholder="Ex: Arroz, Leite, Café..." autocomplete="off" aria-label="Nome do produto">
+                
+                <div class="price-input-wrapper">
+                    <span class="price-currency" aria-hidden="true">R$</span>
+                    <label for="preco" class="visually-hidden">Preço médio</label>
+                    <input type="number" id="preco" placeholder="Preço" step="0.01" min="0" aria-label="Preço médio do produto">
+                </div>
+                
+                <button id="adicionarBtn" class="btn-add" onclick="adicionarItem()" aria-label="Adicionar item à lista">
+                    <i class="fas fa-plus" aria-hidden="true"></i>
+                    <span>Adicionar</span>
+                </button>
+            </div>
+            <p class="dica" role="note">💡 Dica: Adicione o preço médio do produto para estimar o gasto total</p>
+        </div>
+    </div>
 
-        // Verifica se está autenticado
-        async function checkAuth() {
-            const { data } = await supabase.auth.getSession()
-            if (!data.session) {
-                // Se não está logado, redireciona para login
-                window.location.href = 'login.html'
-            }
-        }
-
-        checkAuth()
-    </script>
+    <!-- Anunciador para leitores de tela -->
+    <div id="liveRegion" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
 
     <script type="module" src="app.js"></script>
-
 </body>
+
 </html>
