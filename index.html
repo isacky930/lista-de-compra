@@ -1,37 +1,35 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" href="src/img/favicon.ico" type="image/x-icon">
+    <title>Lista 2026</title>
+
     <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="src/css/index.css">
-    <title>Lista 2026</title>
+
+    <!-- Fonte -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <h2 class="titulo">Minha lista de compras</h2>
-        <button onclick="logout()">Sair</button>
-        <ul id="lista"></ul>
-        <input type="text" id="item" placeholder="Novo Item">
-        <button onclick="adicionarItem()">Adicionar</button>
-    </div>
+
+    <header class="topbar">
+        <h1>Minha lista</h1>
+        <button class="logout" onclick="logout()">Sair</button>
+    </header>
+
+    <main class="container">
+
+        <section class="add-item">
+            <input type="text" id="item" placeholder="Adicionar item...">
+            <button onclick="adicionarItem()">+</button>
+        </section>
+
+        <ul id="lista" class="lista"></ul>
+
+    </main>
 
     <script type="module" src="app.js"></script>
 
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/service-worker.js')
-                    .then(registration => {
-                        console.log('ServiceWorker registrado com sucesso:', registration.scope);
-                    })
-                    .catch(error => {
-                        console.log('Falha ao registrar o ServiceWorker:', error);
-                    });
-            });
-        }
-    </script>
-    
 </body>
 </html>

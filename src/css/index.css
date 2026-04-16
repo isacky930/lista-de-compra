@@ -1,0 +1,134 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: #f8fafc;
+    color: #0f172a;
+}
+
+/* Topbar */
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background: white;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.topbar h1 {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.logout {
+    background: none;
+    border: none;
+    color: #ef4444;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* Container */
+.container {
+    max-width: 500px;
+    margin: auto;
+    padding: 20px;
+}
+
+/* Adicionar item */
+.add-item {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.add-item input {
+    flex: 1;
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    outline: none;
+    font-size: 14px;
+}
+
+.add-item input:focus {
+    border-color: #22c55e;
+    box-shadow: 0 0 0 3px #22c55e20;
+}
+
+.add-item button {
+    width: 50px;
+    border: none;
+    border-radius: 12px;
+    background: #22c55e;
+    color: white;
+    font-size: 22px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.add-item button:hover {
+    background: #16a34a;
+}
+
+/* Lista */
+.lista {
+    list-style: none;
+}
+
+/* Item */
+.lista li {
+    background: white;
+    padding: 14px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: 0.2s;
+}
+
+/* Hover */
+.lista li:hover {
+    transform: scale(1.01);
+}
+
+/* Texto */
+.item-text {
+    font-size: 14px;
+}
+
+/* Botões */
+.item-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-check {
+    background: #22c55e;
+    border: none;
+    color: white;
+    border-radius: 8px;
+    padding: 6px 10px;
+    cursor: pointer;
+}
+
+.btn-delete {
+    background: #ef4444;
+    border: none;
+    color: white;
+    border-radius: 8px;
+    padding: 6px 10px;
+    cursor: pointer;
+}
+
+/* Item concluído */
+.done {
+    opacity: 0.6;
+    text-decoration: line-through;
+}
