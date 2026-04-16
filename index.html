@@ -1,39 +1,46 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" href="icon.png" type="image/x-icon">
-    <link rel="manifest" href="manifest.json">
-    <link rel="stylesheet" href="index.css">
-    <title>Lista 2026</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Lista Compartilhada</title>
+  <link rel="stylesheet" href="src/1/css/index.css">
 </head>
+
 <body>
-    <div class="container">
-        <h2 class="titulo">Minha lista de compras</h2>
-        <button onclick="logout()">Sair</button>
-        <ul id="lista"></ul>
-        <input type="text" id="item" placeholder="Novo Item">
-        <button onclick="adicionarItem()">Adicionar</button>
+  <div class="background"></div>
+
+  <div class="container">
+    
+    <div class="header">
+      <h1>🛒 Lista</h1>
+      <p>Organize suas compras em tempo real</p>
     </div>
 
-    <script type="module" src="app.js"></script>
+    <div class="form">
 
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/service-worker.js')
-                    .then(registration => {
-                        console.log('ServiceWorker registrado com sucesso:', registration.scope);
-                    })
-                    .catch(error => {
-                        console.log('Falha ao registrar o ServiceWorker:', error);
-                    });
-            });
-        }
-    </script>
-    
+      <div class="input-group">
+        <input type="email" id="email" required>
+        <label>Email</label>
+      </div>
+
+      <div class="input-group">
+        <input type="password" id="senha" required>
+        <label>Senha</label>
+      </div>
+
+      <button onclick="login()" class="btn-primary">
+        Entrar
+      </button>
+
+      <p class="link">
+        Não tem conta? <span onclick="cadastro()">Criar agora</span>
+      </p>
+
+    </div>
+
+  </div>
+
+  <script type="module" src="auth.js"></script>
 </body>
 </html>
-
-
