@@ -94,6 +94,71 @@ async function getUser() {
   return user
 }
 
+// Calcula distância de Levenshtein (para correção automática de typos)
+function distanciaLevenshtein(str1, str2) {
+  const m = str1.length
+  const n = str2.length
+  const dp = Array.from({ length: m + 1 }, () => Array(n + 1).fill(0))
+
+  for (let i = 0; i <= m; i++) dp[i][0] = i
+  for (let j = 0; j <= n; j++) dp[0][j] = j
+
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      if (str1[i - 1] === str2[j - 1]) {
+        dp[i][j] = dp[i - 1][j - 1]
+      } else {
+        dp[i][j] = 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1])
+      }
+    }
+  }
+
+  return dp[m][n]
+}
+
+// Sugere correção automática de typos
+function sugerirCorrecao(texto) {
+  const normalizado = texto.toLowerCase().trim()
+  if (!normalizado || normalizado.length < 2) return null
+
+  const sugestoes = Object.keys(PRODUTOS_COMUNS)
+    .map(produto => ({
+      produto,
+      distancia: distanciaLevenshtein(normalizado, produto)
+    }))
+    .filter(s => s.distancia <= 2)
+    .sort((a, b) => a.distancia - b.distancia)
+
+  return sugestoes.length > 0 ? sugestoes[0].produto : null
+}
+
+// Mostra notificação (sucesso, erro, info)
+function mostrarNotificacao(mensagem, tipo = 'info') {
+  const existente = document.querySelector('.notificacao')
+  if (existente) existente.remove()
+
+  const notificacao = document.createElement('div')
+  notificacao.className = `notificacao notificacao-${tipo} mostrar`
+  
+  const icons = {
+    sucesso: '✓',
+    erro: '✕',
+    info: 'ℹ'
+  }
+
+  notificacao.innerHTML = `
+    <i class="fas fa-${tipo === 'sucesso' ? 'check-circle' : tipo === 'erro' ? 'exclamation-circle' : 'info-circle'}" aria-hidden="true"></i>
+    <span>${mensagem}</span>
+  `
+
+  document.body.appendChild(notificacao)
+
+  setTimeout(() => {
+    notificacao.classList.remove('mostrar')
+    setTimeout(() => notificacao.remove(), 300)
+  }, 3500)
+}
+
 // Procura preço automático no banco de produtos
 function buscarPrecoAutomatico(nome) {
   const normalizados = Object.keys(PRODUTOS_COMUNS).map(k => ({
@@ -213,26 +278,48 @@ async function carregarLista() {
 
 // Adiciona novo item à lista
 window.adicionarItem = async function () {
-  if (!inputItem.value.trim()) {
-    alert('Digite o nome do produto')
+  const itemValue = inputItem.value.trim()
+
+  // Validação: campo vazio
+  if (!itemValue) {
+    mostrarNotificacao('Digite o nome do produto para continuar', 'erro')
+    inputItem.focus()
+    inputItem.classList.add('input-error')
+    setTimeout(() => inputItem.classList.remove('input-error'), 500)
     return
+  }
+
+  // Tenta sugerir correção se houver typo
+  const correcao = sugerirCorrecao(itemValue)
+  let itemFinal = itemValue
+
+  if (correcao && correcao.toLowerCase() !== itemValue.toLowerCase()) {
+    // Pergunta se quer a correção
+    const confirmar = confirm(`Você quis dizer "${correcao.charAt(0).toUpperCase() + correcao.slice(1)}"?`)
+    if (confirmar) {
+      itemFinal = correcao.charAt(0).toUpperCase() + correcao.slice(1)
+    }
+  } else {
+    // Capitaliza primeira letra
+    itemFinal = itemValue.charAt(0).toUpperCase() + itemValue.slice(1).toLowerCase()
   }
 
   const user = await getUser()
   const preco = parseFloat(inputPreco.value) || 0
 
   const { error } = await supabase.from('lista_compras').insert({
-    item: inputItem.value.trim(),
+    item: itemFinal,
     preco: preco,
     comprado: false,
     adicionado_por: user.id
   })
 
   if (error) {
-    alert('Erro ao adicionar: ' + error.message)
+    mostrarNotificacao('Erro ao adicionar: ' + error.message, 'erro')
     return
   }
 
+  mostrarNotificacao(`✓ "${itemFinal}" adicionado com sucesso!`, 'sucesso')
   inputItem.value = ''
   inputPreco.value = ''
   document.querySelector('.sugestoes-list')?.remove()
