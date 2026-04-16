@@ -15,6 +15,10 @@ body {
     background: #020617;
     color: #e2e8f0;
     overflow-x: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
 }
 
 /* ── FUNDO ANIMADO ── */
@@ -25,80 +29,103 @@ body {
         radial-gradient(ellipse 80% 60% at 15% 15%, #1d4ed828, transparent 60%),
         radial-gradient(ellipse 60% 50% at 85% 85%, #2563eb20, transparent 60%),
         linear-gradient(160deg, #020617 0%, #0a1628 100%);
-    z-index: -1;
+    z-index: 0;
     pointer-events: none;
 }
 
-/* ── LAYOUT PRINCIPAL ── */
-body {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
+/* ── WRAPPER PRINCIPAL ── */
+.topbar {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 480px;
 }
 
+/* ── CONTAINER CARD ── */
 .container {
     position: relative;
     z-index: 1;
     width: 100%;
-    max-width: 500px;
-    margin: 20px auto;
-    padding: 20px;
-    flex: 1;
+    max-width: 480px;
+    background: rgba(255, 255, 255, 0.035);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-radius: 24px;
+    padding: 40px 32px;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.03) inset,
+        0 32px 80px rgba(0, 0, 0, 0.7),
+        0 8px 32px rgba(0, 0, 0, 0.4);
+    animation: cardIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes cardIn {
+    from { opacity: 0; transform: translateY(24px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 /* ── TOPBAR ── */
 .topbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 24px 0 20px 0;
-    margin-bottom: 24px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    text-align: center;
+    margin-bottom: 32px;
 }
 
 .topbar h1 {
-    font-size: 28px;
+    font-size: 32px;
     font-weight: 600;
-    letter-spacing: -0.5px;
+    letter-spacing: -1px;
+    margin-bottom: 8px;
 }
 
 /* ── BOTÃO LOGOUT ── */
 .logout {
-    background: rgba(239, 68, 68, 0.1);
-    border: 1px solid rgba(239, 68, 68, 0.25);
+    background: rgba(239, 68, 68, 0.12);
+    border: 1px solid rgba(239, 68, 68, 0.3);
     color: #fca5a5;
     
-    padding: 8px 14px;
-    border-radius: 8px;
-    font-size: 13px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 12px;
     font-weight: 500;
     font-family: 'Inter', sans-serif;
+    letter-spacing: 0.02em;
     
     cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-top: 16px;
+    display: inline-block;
 }
 
 .logout:hover {
-    background: rgba(239, 68, 68, 0.15);
-    border-color: rgba(239, 68, 68, 0.4);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+    background: rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(239, 68, 68, 0.25);
 }
 
 .logout:active {
     transform: scale(0.95);
 }
 
+/* ── NOTAS/MENSAGEM ── */
+.subtitle {
+    font-size: 13px;
+    color: #64748b;
+    margin-bottom: 28px;
+    letter-spacing: 0.02em;
+}
+
 /* ── SEÇÃO ADICIONAR ITEM ── */
 .add-item {
     display: flex;
     gap: 12px;
-    margin-bottom: 24px;
+    margin-bottom: 28px;
 }
 
 .add-item input {
     flex: 1;
-    padding: 14px 16px;
+    padding: 14px 40px 14px 40px;
     border-radius: 12px;
     
     border: 1px solid rgba(255, 255, 255, 0.08);
@@ -108,7 +135,7 @@ body {
     font-size: 14px;
     font-family: 'Inter', sans-serif;
     outline: none;
-    transition: all 0.2s;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .add-item input::placeholder {
@@ -131,19 +158,20 @@ body {
     color: white;
     
     font-size: 18px;
-    font-weight: 500;
+    font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     align-items: center;
     justify-content: center;
-    min-width: 50px;
+    min-width: 56px;
     flex-shrink: 0;
+    letter-spacing: 0.02em;
 }
 
 .add-item button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(37, 99, 235, 0.4);
+    box-shadow: 0 12px 32px rgba(37, 99, 235, 0.4);
 }
 
 .add-item button:active {
@@ -155,10 +183,16 @@ body {
     list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    max-height: calc(100vh - 300px);
+    gap: 12px;
+    max-height: 55vh;
     overflow-y: auto;
     padding-right: 4px;
+    animation: fadeIn 0.4s ease-out 0.1s both;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .lista::-webkit-scrollbar {
@@ -170,36 +204,48 @@ body {
 }
 
 .lista::-webkit-scrollbar-thumb {
-    background: rgba(100, 116, 139, 0.3);
+    background: rgba(100, 116, 139, 0.2);
     border-radius: 3px;
 }
 
 .lista::-webkit-scrollbar-thumb:hover {
-    background: rgba(100, 116, 139, 0.5);
+    background: rgba(100, 116, 139, 0.4);
 }
 
 /* ── ITEM DA LISTA ── */
 .lista li {
-    background: rgba(255, 255, 255, 0.04);
+    background: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(12px);
     border-radius: 12px;
     
-    padding: 14px 16px;
+    padding: 16px;
     
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 12px;
     
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: itemSlideIn 0.3s ease-out both;
+}
+
+@keyframes itemSlideIn {
+    from { 
+        opacity: 0; 
+        transform: translateX(-16px);
+    }
+    to { 
+        opacity: 1; 
+        transform: translateX(0);
+    }
 }
 
 .lista li:hover {
     transform: translateY(-2px);
-    background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(59, 130, 246, 0.2);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(59, 130, 246, 0.25);
+    box-shadow: 0 12px 32px rgba(59, 130, 246, 0.15);
 }
 
 /* ── TEXTO DO ITEM ── */
@@ -208,6 +254,7 @@ body {
     color: #e2e8f0;
     flex: 1;
     transition: all 0.2s;
+    font-weight: 500;
 }
 
 /* ── AÇÕES DO ITEM ── */
@@ -219,27 +266,30 @@ body {
 
 /* ── BOTÃO CHECK (CONCLUÍDO) ── */
 .btn-check {
-    background: rgba(34, 197, 94, 0.1);
-    border: 1px solid rgba(34, 197, 94, 0.25);
+    background: rgba(34, 197, 94, 0.12);
+    border: 1.5px solid rgba(34, 197, 94, 0.35);
     color: #86efac;
     
     border-radius: 8px;
-    padding: 6px 10px;
-    font-size: 13px;
+    padding: 8px 12px;
+    font-size: 12px;
+    font-weight: 600;
     
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     align-items: center;
     justify-content: center;
-    min-width: 36px;
-    height: 36px;
+    min-width: 40px;
+    height: 40px;
+    letter-spacing: 0.02em;
 }
 
 .btn-check:hover {
-    background: rgba(34, 197, 94, 0.15);
-    border-color: rgba(34, 197, 94, 0.4);
-    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2);
+    background: rgba(34, 197, 94, 0.18);
+    border-color: rgba(34, 197, 94, 0.6);
+    box-shadow: 0 8px 20px rgba(34, 197, 94, 0.25), inset 0 0 0 1px rgba(34, 197, 94, 0.1);
+    transform: translateY(-2px);
 }
 
 .btn-check:active {
@@ -248,27 +298,30 @@ body {
 
 /* ── BOTÃO DELETE ── */
 .btn-delete {
-    background: rgba(239, 68, 68, 0.1);
-    border: 1px solid rgba(239, 68, 68, 0.25);
+    background: rgba(239, 68, 68, 0.12);
+    border: 1.5px solid rgba(239, 68, 68, 0.35);
     color: #fca5a5;
     
     border-radius: 8px;
-    padding: 6px 10px;
-    font-size: 13px;
+    padding: 8px 12px;
+    font-size: 12px;
+    font-weight: 600;
     
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     align-items: center;
     justify-content: center;
-    min-width: 36px;
-    height: 36px;
+    min-width: 40px;
+    height: 40px;
+    letter-spacing: 0.02em;
 }
 
 .btn-delete:hover {
-    background: rgba(239, 68, 68, 0.15);
-    border-color: rgba(239, 68, 68, 0.4);
-    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+    background: rgba(239, 68, 68, 0.18);
+    border-color: rgba(239, 68, 68, 0.6);
+    box-shadow: 0 8px 20px rgba(239, 68, 68, 0.25), inset 0 0 0 1px rgba(239, 68, 68, 0.1);
+    transform: translateY(-2px);
 }
 
 .btn-delete:active {
@@ -277,25 +330,25 @@ body {
 
 /* ── ITEM CONCLUÍDO ── */
 .done {
-    opacity: 0.5;
+    opacity: 0.4;
     text-decoration: line-through;
     color: #64748b;
 }
 
 /* ── RESPONSIVO ── */
 @media (max-width: 640px) {
-    .container {
-        max-width: 100%;
+    body {
         padding: 16px;
-        margin: 0;
     }
     
-    .topbar {
-        padding: 20px 0 16px 0;
+    .container {
+        max-width: 100%;
+        padding: 32px 24px 28px;
+        border-radius: 20px;
     }
     
     .topbar h1 {
-        font-size: 24px;
+        font-size: 28px;
     }
     
     .add-item {
@@ -303,26 +356,41 @@ body {
     }
     
     .lista li {
-        padding: 12px 14px;
+        padding: 14px;
     }
 }
 
 @media (max-width: 480px) {
-    .container {
+    body {
         padding: 12px;
     }
     
-    .topbar h1 {
-        font-size: 20px;
+    .container {
+        max-width: 100%;
+        padding: 28px 20px 24px;
+        border-radius: 20px;
     }
     
-    .topbar {
-        padding: 16px 0 12px 0;
-        margin-bottom: 16px;
+    .topbar h1 {
+        font-size: 24px;
     }
     
     .logout {
-        padding: 6px 10px;
-        font-size: 12px;
+        padding: 8px 12px;
+        font-size: 11px;
+    }
+    
+    .add-item button {
+        min-width: 48px;
+        font-size: 16px;
+    }
+    
+    .lista {
+        gap: 10px;
+        max-height: 60vh;
+    }
+    
+    .lista li {
+        padding: 12px 14px;
     }
 }
