@@ -61,6 +61,21 @@
         </div>
     </main>
 
+    <script type="module">
+        import { supabase } from './supabaseClient.js'
+
+        // Verifica se já está logado
+        async function checkAuth() {
+            const { data } = await supabase.auth.getSession()
+            if (data.session) {
+                // Se já está logado, redireciona para index
+                window.location.href = 'index.html'
+            }
+        }
+
+        checkAuth()
+    </script>
+
     <script type="module" src="auth.js"></script>
 
 </body>
