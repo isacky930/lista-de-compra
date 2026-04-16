@@ -1,4 +1,9 @@
-* {
+/* =============================================
+   LISTIFY · LOGIN
+   Dark mode elegante · versão 2.0
+   ============================================= */
+
+*, *::before, *::after {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -6,174 +11,336 @@
 
 body {
     font-family: 'Inter', sans-serif;
-
     min-height: 100vh;
-    background: linear-gradient(135deg, #020617, #0f172a);
-
+    background: #020617;
     display: flex;
     align-items: center;
     justify-content: center;
-
     color: #e2e8f0;
+    overflow: hidden;
 }
 
-/* FUNDO */
+/* ── FUNDO ── */
 .background {
     position: fixed;
     inset: 0;
-
     background:
-        radial-gradient(circle at 20% 20%, #1d4ed840, transparent),
-        radial-gradient(circle at 80% 80%, #2563eb30, transparent);
-
-    z-index: -1;
+        radial-gradient(ellipse 80% 60% at 15% 15%, #1d4ed828, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 85% 85%, #2563eb20, transparent 60%),
+        linear-gradient(160deg, #020617 0%, #0a1628 100%);
+    z-index: 0;
 }
 
-/* CONTAINER CENTRAL */
+.bg-orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    z-index: 0;
+    pointer-events: none;
+    animation: float 12s ease-in-out infinite;
+}
+
+.orb-1 {
+    width: 320px;
+    height: 320px;
+    background: #1d4ed818;
+    top: -80px;
+    left: -80px;
+    animation-delay: 0s;
+}
+
+.orb-2 {
+    width: 250px;
+    height: 250px;
+    background: #2563eb14;
+    bottom: -60px;
+    right: -60px;
+    animation-delay: -6s;
+}
+
+@keyframes float {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33%       { transform: translate(20px, -20px) scale(1.05); }
+    66%       { transform: translate(-15px, 15px) scale(0.97); }
+}
+
+/* ── CONTAINER ── */
 .login-container {
+    position: relative;
+    z-index: 1;
     width: 100%;
+    min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
+    padding: 24px 16px;
 }
 
-/* CARD */
+/* ── CARD ── */
 .login-card {
     width: 100%;
-    max-width: 380px;
-
-    background: rgba(255,255,255,0.04);
-    backdrop-filter: blur(15px);
-
-    border-radius: 20px;
-    padding: 35px 28px;
-
-    border: 1px solid rgba(255,255,255,0.08);
-    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
-
+    max-width: 400px;
+    background: rgba(255, 255, 255, 0.035);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-radius: 24px;
+    padding: 40px 32px 32px;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    box-shadow:
+        0 0 0 1px rgba(255,255,255,0.03) inset,
+        0 32px 80px rgba(0, 0, 0, 0.7),
+        0 8px 32px rgba(0, 0, 0, 0.4);
     text-align: center;
+    animation: cardIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-/* LOGO */
+@keyframes cardIn {
+    from { opacity: 0; transform: translateY(24px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+
+/* ── LOGO ── */
+.logo-wrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 8px;
+}
+
 .logo {
-    width: 60px;
-    margin-bottom: 12px;
+    width: 180px;
+    height: auto;
+    /* Inverte a logo para funcionar no dark mode (logo é preta no original) */
+    filter: invert(1) brightness(1.1);
+    user-select: none;
+    pointer-events: none;
 }
 
-/* TITULO */
-h1 {
-    font-size: 22px;
-    font-weight: 600;
-}
-
-/* SUBTITULO */
+/* ── SUBTÍTULO ── */
 .subtitle {
     font-size: 13px;
-    color: #94a3b8;
-    margin-bottom: 20px;
+    color: #475569;
+    margin-bottom: 28px;
+    letter-spacing: 0.02em;
 }
 
-/* INPUT */
+/* ── INPUT GROUP ── */
 .input-group {
     position: relative;
     margin-bottom: 16px;
+    text-align: left;
 }
 
 .input-group input {
     width: 100%;
-    padding: 13px;
-    border-radius: 10px;
-
-    border: 1px solid rgba(255,255,255,0.08);
-
-    background: rgba(255,255,255,0.05);
-    color: white;
-
+    padding: 14px 44px 14px 40px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.04);
+    color: #e2e8f0;
     font-size: 14px;
+    font-family: 'Inter', sans-serif;
     outline: none;
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+}
 
-    transition: 0.2s;
+.input-group input::placeholder {
+    color: transparent;
 }
 
 .input-group input:focus {
     border-color: #3b82f6;
-    box-shadow: 0 0 0 2px #3b82f640;
-    background: rgba(255,255,255,0.08);
+    background: rgba(59, 130, 246, 0.06);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
 }
 
-/* LABEL */
-.input-group label {
+/* ícone à esquerda */
+.input-icon {
     position: absolute;
-    left: 10px;
+    left: 13px;
     top: 50%;
     transform: translateY(-50%);
-
-    font-size: 12px;
-    color: #94a3b8;
-
-    transition: 0.2s;
+    color: #334155;
+    display: flex;
+    align-items: center;
     pointer-events: none;
+    transition: color 0.2s;
+}
+
+.input-group:focus-within .input-icon {
+    color: #3b82f6;
+}
+
+/* botão mostrar senha */
+.toggle-password {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #334155;
+    display: flex;
+    align-items: center;
+    padding: 4px;
+    border-radius: 4px;
+    transition: color 0.2s;
+}
+
+.toggle-password:hover { color: #64748b; }
+
+/* ── FLOATING LABEL ── */
+.input-group label {
+    position: absolute;
+    left: 40px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 14px;
+    color: #475569;
+    transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+    background: transparent;
+    padding: 0 4px;
+    line-height: 1;
 }
 
 .input-group input:focus + label,
 .input-group input:not(:placeholder-shown) + label {
-    top: -7px;
-    font-size: 10px;
+    top: 0;
+    left: 36px;
+    font-size: 11px;
     color: #3b82f6;
+    background: #0a1225;
+    padding: 0 4px;
+    letter-spacing: 0.03em;
 }
 
-/* BOTÃO PRINCIPAL */
+/* ── BOTÃO PRIMÁRIO ── */
 .btn-primary {
     width: 100%;
-    padding: 13px;
-
+    padding: 14px;
+    margin-top: 4px;
     border: none;
-    border-radius: 10px;
-
-    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    border-radius: 12px;
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
     color: white;
-
     font-size: 14px;
     font-weight: 500;
-
+    font-family: 'Inter', sans-serif;
     cursor: pointer;
-
-    transition: 0.2s;
+    transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    letter-spacing: 0.02em;
 }
 
 .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(37,99,235,0.5);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(37, 99, 235, 0.45);
 }
 
 .btn-primary:active {
-    transform: scale(0.96);
+    transform: scale(0.98);
+    box-shadow: none;
 }
 
-/* BOTÃO SECUNDÁRIO */
+.btn-primary.loading .btn-text { opacity: 0; }
+.btn-primary.loading .btn-spinner { opacity: 1; }
+
+.btn-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    position: absolute;
+    opacity: 0;
+    animation: spin 0.7s linear infinite;
+    transition: opacity 0.15s;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ── DIVIDER ── */
+.divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 16px 0;
+    color: #1e293b;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.divider::before,
+.divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(255,255,255,0.06);
+}
+
+/* ── BOTÃO SECUNDÁRIO ── */
 .btn-secondary {
-    margin-top: 10px;
     width: 100%;
-
+    padding: 13px;
     background: transparent;
-    border: 1px solid rgba(255,255,255,0.15);
-
-    color: #cbd5f5;
-
-    padding: 11px;
-    border-radius: 10px;
-
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: #94a3b8;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
     cursor: pointer;
-    transition: 0.2s;
+    transition: background 0.2s, border-color 0.2s, color 0.2s;
+    letter-spacing: 0.02em;
 }
 
 .btn-secondary:hover {
-    background: rgba(255,255,255,0.05);
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.18);
+    color: #cbd5e1;
 }
 
-/* TEXTO */
+.btn-secondary:active {
+    transform: scale(0.98);
+}
+
+/* ── RODAPÉ LEGAL ── */
 .legal {
-    margin-top: 16px;
-    font-size: 10px;
-    color: #64748b;
+    margin-top: 20px;
+    font-size: 11px;
+    color: #1e293b;
+    line-height: 1.6;
+}
+
+.legal a {
+    color: #334155;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.legal a:hover {
+    color: #3b82f6;
+}
+
+/* ── RESPONSIVO ── */
+@media (max-width: 440px) {
+    .login-card {
+        padding: 32px 20px 28px;
+        border-radius: 20px;
+    }
+
+    .logo { width: 150px; }
+}
+
+@media (min-width: 768px) {
+    .login-card {
+        padding: 48px 40px 40px;
+    }
 }
