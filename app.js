@@ -243,10 +243,12 @@ function buscarPrecoAutomatico(nome) {
 
 // Obtém ícone do produto (busca exata ou genérico)
 function obterIconeProduto(nome) {
-  const nomeLower = nome.toLowerCase()
+  const nomeLower = nome.toLowerCase().trim()
+  console.log('🔍 Procurando ícone para:', nomeLower)
   
   // Tenta buscar ícone exato
   if (ICONES_PRODUTOS[nomeLower]) {
+    console.log('✓ Encontrou ícone exato:', ICONES_PRODUTOS[nomeLower])
     return ICONES_PRODUTOS[nomeLower]
   }
   
@@ -262,7 +264,8 @@ function obterIconeProduto(nome) {
     }
   }
   
-  return melhorIcone
+  console.log('✓ Ícone selecionado por similaridade:', melhorIcone)
+  return melhorIcone || '📦'
 }
 
 // Calcula similaridade entre strings (para autocomplete)
@@ -362,7 +365,8 @@ async function carregarLista() {
     
     data.forEach((item) => {
       const precoItem = item.preco || 0
-      const icone = obterIconeProduto(item.item)
+      const icone = obterIconeProduto(item.item) || '📦'
+      console.log(`📌 Item: "${item.item}" → Ícone: "${icone}"`)
       const li = document.createElement('li')
       li.className = item.comprado ? 'done' : ''
       li.innerHTML = `
@@ -380,6 +384,7 @@ async function carregarLista() {
           </button>
         </div>
       `
+      console.log('HTML gerado:', li.innerHTML.substring(0, 150))
       lista.appendChild(li)
     })
 

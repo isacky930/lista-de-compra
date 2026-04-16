@@ -347,11 +347,14 @@ body::before {
 /* Ícone do item */
 .item-icon {
     font-size: 1.5rem;
-    min-width: 24px;
+    min-width: 32px;
+    width: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    line-height: 1;
 }
 
 /* Detalhes do item com preço */
