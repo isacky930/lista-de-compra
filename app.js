@@ -235,10 +235,11 @@ function mostrarSugestoes(text) {
 // Carrega e renderiza a lista do Supabase
 async function carregarLista() {
   try {
+    console.log('🔄 Carregando lista...')
+    
     const { data, error } = await supabase
       .from('lista_compras')
       .select('*')
-      .order('created_at', { ascending: false })
     
     if (error) {
       console.error('❌ Erro ao carregar lista:', error)
