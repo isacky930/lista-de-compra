@@ -30,11 +30,20 @@ window.cadastro = async function () {
 
 // Função para login com Google
 window.loginGoogle = async function () {
-  const { error } = await supabase.auth.signInWithOAuth({
-    provider: 'google',
-  })
-  if (error) {
-    alert('Erro ao fazer login com Google: ' + error.message)
+  try {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: window.location.origin + '/index.html'
+      }
+    })
+    if (error) {
+      console.error('Erro OAuth:', error)
+      alert('Erro ao fazer login com Google: ' + error.message)
+    }
+  } catch (err) {
+    console.error('Erro:', err)
+    alert('Erro ao fazer login com Google. Verifique se o Google OAuth está configurado.')
   }
 }
 
