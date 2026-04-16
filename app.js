@@ -72,6 +72,76 @@ const PRODUTOS_COMUNS = {
 }
 
 // ============================================
+// MAPEAMENTO DE ÍCONES PARA PRODUTOS
+// ============================================
+const ICONES_PRODUTOS = {
+  'arroz': '🍚',
+  'feijão': '🫘',
+  'macarrão': '🍝',
+  'leite': '🥛',
+  'pão': '🍞',
+  'ovos': '🥚',
+  'queijo': '🧀',
+  'manteiga': '🧈',
+  'açúcar': '🍬',
+  'sal': '🧂',
+  'óleo': '🫗',
+  'café': '☕',
+  'chá': '🍵',
+  'suco': '🧃',
+  'refrigerante': '🥤',
+  'água': '💧',
+  'cerveja': '🍺',
+  'vinho': '🍷',
+  'frango': '🍗',
+  'carne': '🥩',
+  'peixe': '🐟',
+  'banana': '🍌',
+  'maçã': '🍎',
+  'laranja': '🍊',
+  'morango': '🍓',
+  'tomate': '🍅',
+  'alface': '🥬',
+  'cenoura': '🥕',
+  'batata': '🥔',
+  'cebola': '🧅',
+  'alho': '🧄',
+  'brócolis': '🥦',
+  'chocolate': '🍫',
+  'bolo': '🎂',
+  'biscoito': '🍪',
+  'bolacha': '🍘',
+  'iogurte': '🥛',
+  'requeijão': '🧀',
+  'mozzarela': '🧀',
+  'presunto': '🥓',
+  'salsicha': '🌭',
+  'linguiça': '🌭',
+  'bacon': '🥓',
+  'peito de frango': '🍗',
+  'coxa de frango': '🍗',
+  'asa de frango': '🍗',
+  'desinfetante': '🧼',
+  'sabão': '🧼',
+  'shampoo': '🧴',
+  'sabonete': '🧼',
+  'papel higiênico': '🧻',
+  'lenço de papel': '🧻',
+  'detergente': '🧼',
+  'amaciante': '💦',
+  'desodorante': '☁️',
+  'escova de dente': '🪥',
+  'pasta de dente': '🪥',
+  'fio dental': '🪥',
+  'absorvente': '💧',
+  'fralda': '👶',
+  'papel machê': '📄',
+  'tampa plástica': '🔒',
+  'sacola': '🛍️',
+  'abraçadeira': '🔗',
+}
+
+// ============================================
 // ELEMENTOS DO DOM
 // ============================================
 const lista = document.getElementById('lista')
@@ -171,6 +241,30 @@ function buscarPrecoAutomatico(nome) {
   return melhor && melhor.similarity > 0.6 ? melhor.preco : null
 }
 
+// Obtém ícone do produto (busca exata ou genérico)
+function obterIconeProduto(nome) {
+  const nomeLower = nome.toLowerCase()
+  
+  // Tenta buscar ícone exato
+  if (ICONES_PRODUTOS[nomeLower]) {
+    return ICONES_PRODUTOS[nomeLower]
+  }
+  
+  // Tenta encontrar por similaridade
+  let melhorIcone = '📦' // ícone padrão
+  let melhorSimilaridade = 0
+  
+  for (const [produto, icone] of Object.entries(ICONES_PRODUTOS)) {
+    const similarity = calcularSimilaridade(nomeLower, produto)
+    if (similarity > melhorSimilaridade) {
+      melhorSimilaridade = similarity
+      melhorIcone = icone
+    }
+  }
+  
+  return melhorIcone
+}
+
 // Calcula similaridade entre strings (para autocomplete)
 function calcularSimilaridade(str1, str2) {
   const len = Math.max(str1.length, str2.length)
@@ -268,11 +362,13 @@ async function carregarLista() {
     
     data.forEach((item) => {
       const precoItem = item.preco || 0
+      const icone = obterIconeProduto(item.item)
       const li = document.createElement('li')
       li.className = item.comprado ? 'done' : ''
       li.innerHTML = `
         <div class="item-content">
           <input type="checkbox" class="item-checkbox" onchange="alterarStatus('${item.id}', this.checked)" ${item.comprado ? 'checked' : ''} aria-label="Marcar ${item.item} como comprado">
+          <div class="item-icon">${icone}</div>
           <div class="item-details">
             <span class="item-text ${item.comprado ? 'comprado' : ''}">${item.item}</span>
             <span class="item-preco">R$ ${precoItem.toFixed(2)}</span>
