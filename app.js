@@ -310,26 +310,44 @@ window.adicionarItem = async function () {
   // Tenta sugerir correção se houver typo
   const correcao = sugerirCorrecao(itemValue)
   let itemFinal = itemValue
+  let precoFinal = parseFloat(inputPreco.value) || 0
 
   if (correcao && correcao.toLowerCase() !== itemValue.toLowerCase()) {
     // Pergunta se quer a correção
     const confirmar = confirm(`Você quis dizer "${correcao.charAt(0).toUpperCase() + correcao.slice(1)}"?`)
     if (confirmar) {
       itemFinal = correcao.charAt(0).toUpperCase() + correcao.slice(1)
+      
+      // Se o preço não foi digitado, busca automaticamente do item corrigido
+      if (!precoFinal) {
+        const precoAuto = buscarPrecoAutomatico(itemFinal)
+        if (precoAuto) {
+          precoFinal = precoAuto
+          console.log('💰 Preço automático do item corrigido:', precoFinal)
+        }
+      }
     }
   } else {
     // Capitaliza primeira letra
     itemFinal = itemValue.charAt(0).toUpperCase() + itemValue.slice(1).toLowerCase()
+    
+    // Se preço vazio, tenta buscar para o item digitado corretamente também
+    if (!precoFinal) {
+      const precoAuto = buscarPrecoAutomatico(itemFinal)
+      if (precoAuto) {
+        precoFinal = precoAuto
+        console.log('💰 Preço automático do item:', precoFinal)
+      }
+    }
   }
 
   const user = await getUser()
-  const preco = parseFloat(inputPreco.value) || 0
 
-  console.log('➕ Adicionando item:', itemFinal, 'Preço:', preco)
+  console.log('➕ Adicionando item:', itemFinal, 'Preço:', precoFinal)
 
   const { data: insertData, error } = await supabase.from('lista_compras').insert({
     item: itemFinal,
-    preco: preco,
+    preco: precoFinal,
     comprado: false,
     adicionado_por: user.id
   }).select()
