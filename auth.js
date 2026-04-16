@@ -28,6 +28,16 @@ window.cadastro = async function () {
   }
 }
 
+// Função para login com Google
+window.loginGoogle = async function () {
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+  })
+  if (error) {
+    alert('Erro ao fazer login com Google: ' + error.message)
+  }
+}
+
 document.addEventListener('keydown', function (event) {
   if (event.key === 'Enter') {
     const caminho = window.location.pathname
