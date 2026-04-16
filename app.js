@@ -234,23 +234,37 @@ function mostrarSugestoes(text) {
 
 // Carrega e renderiza a lista do Supabase
 async function carregarLista() {
-  const { data, error } = await supabase.from('lista_compras').select('*').order('created_at', { ascending: false })
-  if (error) {
-    console.error('Erro ao carregar lista:', error)
-    return
-  }
+  try {
+    const { data, error } = await supabase
+      .from('lista_compras')
+      .select('*')
+      .order('created_at', { ascending: false })
+    
+    if (error) {
+      console.error('❌ Erro ao carregar lista:', error)
+      mostrarNotificacao('Erro ao carregar lista: ' + error.message, 'erro')
+      return
+    }
 
-  lista.innerHTML = ''
-  
-  if (data.length === 0) {
-    lista.innerHTML = `
-      <li class="empty-state" role="status">
-        <i class="fas fa-clipboard-list" aria-hidden="true"></i>
-        <p>Sua lista está vazia</p>
-        <small>Adicione itens abaixo</small>
-      </li>
-    `
-  } else {
+    console.log('✓ Lista carregada:', data?.length || 0, 'itens')
+    
+    lista.innerHTML = ''
+    
+    if (!data || data.length === 0) {
+      console.log('📭 Lista vazia')
+      lista.innerHTML = `
+        <li class="empty-state" role="status">
+          <i class="fas fa-clipboard-list" aria-hidden="true"></i>
+          <p>Sua lista está vazia</p>
+          <small>Adicione itens abaixo</small>
+        </li>
+      `
+      atualizarEstatisticas()
+      return
+    }
+
+    console.log('📋 Renderizando', data.length, 'itens')
+    
     data.forEach((item) => {
       const precoItem = item.preco || 0
       const li = document.createElement('li')
@@ -271,9 +285,12 @@ async function carregarLista() {
       `
       lista.appendChild(li)
     })
-  }
 
-  atualizarEstatisticas()
+    atualizarEstatisticas()
+  } catch (err) {
+    console.error('❌ Erro inesperado ao carregar lista:', err)
+    mostrarNotificacao('Erro inesperado: ' + err.message, 'erro')
+  }
 }
 
 // Adiciona novo item à lista
@@ -307,23 +324,32 @@ window.adicionarItem = async function () {
   const user = await getUser()
   const preco = parseFloat(inputPreco.value) || 0
 
-  const { error } = await supabase.from('lista_compras').insert({
+  console.log('➕ Adicionando item:', itemFinal, 'Preço:', preco)
+
+  const { data: insertData, error } = await supabase.from('lista_compras').insert({
     item: itemFinal,
     preco: preco,
     comprado: false,
     adicionado_por: user.id
-  })
+  }).select()
 
   if (error) {
+    console.error('❌ Erro na inserção:', error)
     mostrarNotificacao('Erro ao adicionar: ' + error.message, 'erro')
     return
   }
 
+  console.log('✓ Item inserido:', insertData)
   mostrarNotificacao(`✓ "${itemFinal}" adicionado com sucesso!`, 'sucesso')
   inputItem.value = ''
   inputPreco.value = ''
   document.querySelector('.sugestoes-list')?.remove()
-  carregarLista()
+  
+  // Pequeno delay para o Supabase processar
+  await new Promise(resolve => setTimeout(resolve, 300))
+  
+  console.log('🔄 Recarregando lista...')
+  await carregarLista()
   inputItem.focus()
 }
 
@@ -331,21 +357,31 @@ window.adicionarItem = async function () {
 window.removerItem = async function (id) {
   if (!confirm('Remover item?')) return
 
+  console.log('🗑️ Removendo item:', id)
+
   const { error } = await supabase.from('lista_compras').delete().eq('id', id)
   if (error) {
-    alert('Erro ao remover: ' + error.message)
+    console.error('❌ Erro ao remover:', error)
+    mostrarNotificacao('Erro ao remover: ' + error.message, 'erro')
     return
   }
+  
+  console.log('✓ Item removido')
+  mostrarNotificacao('Item removido com sucesso!', 'sucesso')
   carregarLista()
 }
 
 // Altera status de comprado
 window.alterarStatus = async function (id, comprado) {
+  console.log('✓ Alterando status do item:', id, '→', comprado)
+
   const { error } = await supabase.from('lista_compras').update({ comprado }).eq('id', id)
   if (error) {
-    console.error('Erro ao atualizar:', error)
+    console.error('❌ Erro ao atualizar:', error)
+    mostrarNotificacao('Erro ao atualizar: ' + error.message, 'erro')
     return
   }
+  console.log('✓ Status alterado')
   carregarLista()
 }
 
@@ -353,11 +389,17 @@ window.alterarStatus = async function (id, comprado) {
 window.limparComprados = async function () {
   if (!confirm('Remover todos os itens comprados?')) return
 
+  console.log('🗑️ Removendo itens comprados...')
+
   const { error } = await supabase.from('lista_compras').delete().eq('comprado', true)
   if (error) {
-    alert('Erro ao limpar: ' + error.message)
+    console.error('❌ Erro ao limpar:', error)
+    mostrarNotificacao('Erro ao limpar: ' + error.message, 'erro')
     return
   }
+  
+  console.log('✓ Itens comprados removidos')
+  mostrarNotificacao('Itens comprados removidos!', 'sucesso')
   carregarLista()
 }
 
@@ -365,28 +407,44 @@ window.limparComprados = async function () {
 window.limparLista = async function () {
   if (!confirm('Remover TODOS os itens da lista?')) return
 
-  const { error } = await supabase.from('lista_compras').delete().neq('id', 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx')
+  const { error } = await supabase.from('lista_compras').delete().gt('id', '0')
   if (error) {
-    alert('Erro ao limpar: ' + error.message)
+    mostrarNotificacao('Erro ao limpar: ' + error.message, 'erro')
     return
   }
+  mostrarNotificacao('Lista limpa com sucesso!', 'sucesso')
   carregarLista()
 }
 
 // Atualiza estatísticas
 async function atualizarEstatisticas() {
-  const { data, error } = await supabase.from('lista_compras').select('*')
-  if (error) return
+  try {
+    const { data, error } = await supabase.from('lista_compras').select('*')
+    
+    if (error) {
+      console.error('❌ Erro ao carregar estatísticas:', error)
+      return
+    }
 
-  const total = data.length
-  const comprados = data.filter(i => i.comprado).length
-  const pendentes = total - comprados
-  const valorTotalCompras = data.reduce((sum, item) => sum + (item.preco || 0), 0)
+    if (!data) {
+      console.warn('⚠️ Dados de estatísticas são null')
+      return
+    }
 
-  totalItens.textContent = total
-  itensComprados.textContent = comprados
-  itensPendentes.textContent = pendentes
-  valorTotal.textContent = formatarMoeda(valorTotalCompras)
+    console.log('📊 Atualizando estatísticas com', data.length, 'itens')
+
+    const total = data.length
+    const comprados = data.filter(i => i.comprado).length
+    const pendentes = total - comprados
+    const valorTotalCompras = data.reduce((sum, item) => sum + (item.preco || 0), 0)
+
+    totalItens.textContent = total
+    itensComprados.textContent = comprados
+    itensPendentes.textContent = pendentes
+    valorTotal.textContent = formatarMoeda(valorTotalCompras)
+  } catch (err) {
+    console.error('❌ Erro inesperado ao atualizar estatísticas:', err)
+  }
 }
 
 // Realiza logout
