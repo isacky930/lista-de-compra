@@ -1,64 +1,106 @@
-const CACHE_NAME = 'lista-compras-v1';
-const urlsToCache = [
+const CACHE_STATIC = 'static-v2';
+const CACHE_DYNAMIC = 'dynamic-v2';
+
+// Arquivos essenciais
+const STATIC_ASSETS = [
   '/',
-  '/login.html',
-  '/src/css/login.css',
   '/index.html',
+  '/login.html',
   '/src/css/index.css',
+  '/src/css/login.css',
   '/app.js',
-  '/manifest.json',
-  '/src/icons/icon-72x72.png',
-  '/src/icons/icon-96x96.png',
-  '/src/icons/icon-128x128.png',
-  '/src/icons/icon-144x144.png',
-  '/src/icons/icon-152x152.png',
-  '/src/icons/icon-192x192.png',
-  '/src/icons/icon-384x384.png',
-  '/src/icons/icon-512x512.png'
+  '/auth.js',
+  '/manifest.json'
 ];
 
+// ============================
+// INSTALL
+// ============================
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        return cache.addAll(urlsToCache);
-      })
+    caches.open(CACHE_STATIC)
+      .then(cache => cache.addAll(STATIC_ASSETS))
   );
+
+  self.skipWaiting();
 });
 
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        if (response) {
-          return response;
-        }
-        return fetch(event.request)
-          .then(response => {
-            if (!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
-            }
-            const responseToCache = response.clone();
-            caches.open(CACHE_NAME)
-              .then(cache => {
-                cache.put(event.request, responseToCache);
-              });
-            return response;
-          });
-      })
-  );
-});
-
+// ============================
+// ACTIVATE
+// ============================
 self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys().then(cacheNames => {
+    caches.keys().then(keys => {
       return Promise.all(
-        cacheNames.map(cacheName => {
-          if (cacheName !== CACHE_NAME) {
-            return caches.delete(cacheName);
+        keys.map(key => {
+          if (key !== CACHE_STATIC && key !== CACHE_DYNAMIC) {
+            return caches.delete(key);
           }
         })
       );
     })
   );
+
+  self.clients.claim();
 });
+
+// ============================
+// FETCH
+// ============================
+self.addEventListener('fetch', event => {
+  const req = event.request;
+
+  // HTML → network first (sempre atualizado)
+  if (req.headers.get('accept')?.includes('text/html')) {
+    event.respondWith(networkFirst(req));
+    return;
+  }
+
+  // CSS/JS → cache first
+  if (
+    req.url.includes('.css') ||
+    req.url.includes('.js')
+  ) {
+    event.respondWith(cacheFirst(req));
+    return;
+  }
+
+  // Outros → network fallback cache
+  event.respondWith(networkWithCache(req));
+});
+
+// ============================
+// STRATEGIES
+// ============================
+
+async function cacheFirst(req) {
+  const cache = await caches.open(CACHE_STATIC);
+  const cached = await cache.match(req);
+
+  return cached || fetch(req);
+}
+
+async function networkFirst(req) {
+  const cache = await caches.open(CACHE_DYNAMIC);
+
+  try {
+    const fresh = await fetch(req);
+    cache.put(req, fresh.clone());
+    return fresh;
+  } catch {
+    const cached = await cache.match(req);
+    return cached || caches.match('/index.html');
+  }
+}
+
+async function networkWithCache(req) {
+  const cache = await caches.open(CACHE_DYNAMIC);
+
+  try {
+    const fresh = await fetch(req);
+    cache.put(req, fresh.clone());
+    return fresh;
+  } catch {
+    return cache.match(req);
+  }
+}

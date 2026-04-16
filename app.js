@@ -1,69 +1,129 @@
 import { supabase } from './supabaseClient.js'
 
-// Recupera o usuário logado. Redireciona para login se não estiver autenticado.
+// ELEMENTOS
+const lista = document.getElementById('lista')
+const input = document.getElementById('item')
+
+// ============================
+// AUTH
+// ============================
 async function getUser() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) window.location.href = 'login.html'
   return user
 }
 
-// Elementos do DOM
-const lista = document.getElementById('lista')
-const input = document.getElementById('item')
+// ============================
+// UI HELPERS
+// ============================
+function criarItemElemento(item) {
+  const li = document.createElement('li')
 
-// Carrega a lista de compras do Supabase
+  const span = document.createElement('span')
+  span.textContent = item.item
+
+  const btn = document.createElement('button')
+  btn.textContent = 'Remover'
+  btn.classList.add('btn-remove')
+
+  btn.addEventListener('click', () => removerItem(item.id))
+
+  li.appendChild(span)
+  li.appendChild(btn)
+
+  return li
+}
+
+function limparInput() {
+  input.value = ''
+  input.focus()
+}
+
+// ============================
+// LISTA
+// ============================
 async function carregarLista() {
-  const { data, error } = await supabase.from('lista_compras').select('*')
+  const { data, error } = await supabase
+    .from('lista_compras')
+    .select('*')
+    .order('created_at', { ascending: true })
+
   if (error) {
-    console.error('Erro ao carregar lista:', error)
+    console.error(error)
     return
   }
 
-  // Limpa a lista e renderiza os itens
   lista.innerHTML = ''
-  data.forEach((item) => {
-    const li = document.createElement('li')
-    li.innerHTML = `${item.item} <button onclick="removerItem('${item.id}')">Remover</button>`
-    lista.appendChild(li)
+  data.forEach(item => {
+    const elemento = criarItemElemento(item)
+    lista.appendChild(elemento)
   })
 }
 
-// Adiciona novo item Ã  lista de compras
-window.adicionarItem = async function () {
+// ============================
+// AÇÕES
+// ============================
+async function adicionarItem() {
+  const valor = input.value.trim()
+
+  if (!valor) return
+
   const user = await getUser()
-  console.log('UsuÃ¡rio:', user)
-  console.log('Item:', input.value)
 
-  const { error } = await supabase.from('lista_compras').insert({
-    item: input.value,
-    adicionado_por: user.id // Certifique-se que a coluna existe e Ã© do tipo uuid
-  })
+  input.disabled = true
 
-  if (error) return alert('Erro ao adicionar: ' + error.message)
+  const { error } = await supabase
+    .from('lista_compras')
+    .insert({
+      item: valor,
+      adicionado_por: user.id
+    })
 
-  input.value = ''
+  input.disabled = false
+
+  if (error) {
+    mostrarErro('Erro ao adicionar item')
+    return
+  }
+
+  limparInput()
   carregarLista()
 }
 
-// Remove item da lista pelo ID
-window.removerItem = async function (id) {
-  const { error } = await supabase.from('lista_compras').delete().eq('id', id)
-  if (error) return alert('Erro ao remover: ' + error.message)
+async function removerItem(id) {
+  const { error } = await supabase
+    .from('lista_compras')
+    .delete()
+    .eq('id', id)
+
+  if (error) {
+    mostrarErro('Erro ao remover item')
+    return
+  }
+
   carregarLista()
 }
 
-// Realiza logout do usuÃ¡rio
-window.logout = async function () {
-  await supabase.auth.signOut()
-  window.location.href = 'login.html'
+// ============================
+// UX
+// ============================
+function mostrarErro(msg) {
+  alert(msg) // depois vamos melhorar isso
 }
 
-// Inicializa: verifica se o usuÃ¡rio estÃ¡ logado e carrega a lista
-getUser().then(carregarLista)
-
-// enter funciona para adicionar item
-document.addEventListener('keydown', function (event) {
-  if (event.key === 'Enter') {
-      adicionarItem()
- }
+// ENTER
+input.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    adicionarItem()
+  }
 })
+
+// ============================
+// INIT
+// ============================
+async function init() {
+  await getUser()
+  await carregarLista()
+}
+
+init()

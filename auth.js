@@ -1,40 +1,130 @@
 import { supabase } from './supabaseClient.js'
 
-// Função para login do usuário
-window.login = async function () {
-  const email = document.getElementById('email').value
-  const senha = document.getElementById('senha').value
+// ELEMENTOS
+const emailInput = document.getElementById('email')
+const senhaInput = document.getElementById('senha')
+const btnLogin = document.querySelector('.btn-login')
+const btnCadastro = document.querySelector('.btn-cadastro')
 
-  // Autentica com Supabase
-  const { error } = await supabase.auth.signInWithPassword({ email, password: senha })
-  if (error) {
-    alert('Erro no login: ' + error.message)
+// ============================
+// UI
+// ============================
+function setLoading(button, loading) {
+  if (!button) return
+
+  if (loading) {
+    button.disabled = true
+    button.textContent = 'Carregando...'
   } else {
-    // Redireciona para página principal
+    button.disabled = false
+    button.textContent = button.dataset.label
+  }
+}
+
+function mostrarErro(msg) {
+  criarToast(msg, 'erro')
+}
+
+function mostrarSucesso(msg) {
+  criarToast(msg, 'sucesso')
+}
+
+// Toast simples (sem biblioteca)
+function criarToast(msg, tipo) {
+  const toast = document.createElement('div')
+  toast.className = `toast ${tipo}`
+  toast.textContent = msg
+
+  document.body.appendChild(toast)
+
+  setTimeout(() => {
+    toast.remove()
+  }, 3000)
+}
+
+// ============================
+// VALIDAÇÃO
+// ============================
+function validar() {
+  const email = emailInput.value.trim()
+  const senha = senhaInput.value.trim()
+
+  if (!email) {
+    mostrarErro('Digite seu email')
+    return false
+  }
+
+  if (senha.length < 6) {
+    mostrarErro('Senha deve ter no mínimo 6 caracteres')
+    return false
+  }
+
+  return true
+}
+
+// ============================
+// LOGIN
+// ============================
+async function login() {
+  if (!validar()) return
+
+  setLoading(btnLogin, true)
+
+  const email = emailInput.value
+  const senha = senhaInput.value
+
+  const { error } = await supabase.auth.signInWithPassword({
+    email,
+    password: senha
+  })
+
+  setLoading(btnLogin, false)
+
+  if (error) {
+    mostrarErro('Email ou senha inválidos')
+    return
+  }
+
+  mostrarSucesso('Login realizado!')
+  
+  setTimeout(() => {
     window.location.href = 'index.html'
-  }
+  }, 800)
 }
 
-// Função para cadastrar novo usuário
-window.cadastro = async function () {
-  const email = document.getElementById('email').value
-  const senha = document.getElementById('senha').value
+// ============================
+// CADASTRO
+// ============================
+async function cadastro() {
+  if (!validar()) return
 
-  const { error } = await supabase.auth.signUp({ email, password: senha })
+  setLoading(btnCadastro, true)
+
+  const email = emailInput.value
+  const senha = senhaInput.value
+
+  const { error } = await supabase.auth.signUp({
+    email,
+    password: senha
+  })
+
+  setLoading(btnCadastro, false)
+
   if (error) {
-    alert('Erro no cadastro: ' + error.message)
-  } else {
-    alert('Cadastro realizado! Faça login.')
+    mostrarErro(error.message)
+    return
   }
+
+  mostrarSucesso('Conta criada! Faça login.')
 }
 
-document.addEventListener('keydown', function (event) {
-  if (event.key === 'Enter') {
-    const caminho = window.location.pathname
-    if (caminho.includes('login')) {
-      login()
-    } else if (caminho.includes('cadastro')) {
-      cadastro()
-    }
-  }
+// ============================
+// EVENTOS
+// ============================
+btnLogin?.addEventListener('click', login)
+btnCadastro?.addEventListener('click', cadastro)
+
+// ENTER
+senhaInput?.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') login()
 })
